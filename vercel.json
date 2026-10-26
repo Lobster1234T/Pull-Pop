@@ -51,7 +51,7 @@
       "description": "Socket.io server URL for real-time updates"
     }
   },
-  "regions": ["sfo"],
+  "regions": ["iad1"],
   "functions": {
     "app/api/**": {
       "memory": 1024,

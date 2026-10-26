@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "name" VARCHAR(255),
-ADD COLUMN     "role" TEXT NOT NULL DEFAULT 'user';

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Бронь — Аватар</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--cy:#2ee6d6;--vi:#7a5cff;--pk:#ff4fa3;--tx:#eef3ff;--mu:#a9b6d8;box-sizing:border-box}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#060a24;color:var(--tx);font-family:Manrope,system-ui,sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+header{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;background:linear-gradient(rgba(5,8,24,.8),transparent)}
+header a,#who{color:var(--tx);font-size:13px;text-decoration:none}
+.logo{font-family:Unbounded,sans-serif;font-weight:800;letter-spacing:.05em}
+#chips{position:fixed;z-index:5;top:calc(58px + env(safe-area-inset-top,0px));left:0;right:0;display:flex;gap:8px;padding:0 16px;overflow-x:auto}
+#chips button{font:inherit;font-size:14px;font-weight:600;color:var(--tx);background:rgba(10,14,50,.7);border:1px solid #33449e;padding:8px 14px;border-radius:999px;white-space:nowrap;cursor:pointer}
+#chips button.on{background:var(--cy);color:#021218;border-color:var(--cy)}
+#lg{position:fixed;z-index:5;top:calc(106px + env(safe-area-inset-top,0px));left:16px;display:flex;gap:12px;font-size:12px;color:var(--mu)}
+#lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+#pn{position:fixed;z-index:6;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:400px;background:rgba(8,12,44,.88);border:1px solid #2a3a9a;border-radius:20px;padding:18px;backdrop-filter:blur(10px)}
+#pn h2{font-family:Unbounded,sans-serif;font-size:20px;margin:0 0 4px}
+#pn p{margin:0 0 12px;color:var(--mu);font-size:14px;line-height:1.4}
+.row{display:flex;gap:8px;margin-bottom:12px}
+input,select{flex:1;min-width:0;padding:12px;border-radius:12px;border:1px solid #33449e;background:#0a1038;color:var(--tx);font:inherit}
+.btn{width:100%;padding:14px;border:0;border-radius:999px;background:var(--cy);color:#021218;font-family:Unbounded,sans-serif;font-weight:600;font-size:14px;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:default}
+#ok{color:#7dffb3;font-size:14px;min-height:0;margin:0 0 8px}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--pk);outline-offset:2px}
+@media(min-width:800px){#pn{left:auto;right:20px;bottom:20px;width:360px}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<header><a class="logo" href="index.html">АВАТАР</a><span id="who">Выбор места</span><a href="index.html">На главную</a></header>
+<div id="chips"></div>
+<div id="lg"><span><i style="background:#2ee6d6"></i>Свободно</span><span><i style="background:#ff4b4b"></i>Занято</span><span><i style="background:#ffe86b"></i>Выбрано</span></div>
+<div id="pn"><h2 id="ti">Выберите место</h2><p id="sp">Нажмите на свободный ПК в зале. Зал можно вращать и приближать.</p>
+<div class="row"><input id="dt" type="datetime-local"><select id="hr"><option value="1">1 ч</option><option value="2">2 ч</option><option value="3">3 ч</option><option value="5">5 ч</option></select></div>
+<p id="ok"></p><button class="btn" id="bk" disabled>Забронировать</button></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var $=function(s){return document.getElementById(s)};
+var Z={vip:{n:'VIP',c:0xff4fa3,w:1.5,pr:300,sp:'Ультраширокий 34″ · RTX 4080 · кресло-реклайнер'},pro:{n:'Про',c:0x7a5cff,w:1.05,pr:200,sp:'Монитор 27″ 240 Гц · RTX 4070 · механическая клавиатура'},start:{n:'Старт',c:0x2ee6d6,w:.95,pr:150,sp:'Монитор 24″ 144 Гц · RTX 4060'},con:{n:'Консоль',c:0xffe86b,pr:250,sp:'ТВ 55″ 4K · геймпады · диван'}};
+var r=new THREE.WebGLRenderer({canvas:$('c'),antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,2));
+var sc=new THREE.Scene();sc.background=new THREE.Color(0x060a24);sc.fog=new THREE.Fog(0x060a24,22,48);
+var cam=new THREE.PerspectiveCamera(45,1,.1,80);
+sc.add(new THREE.AmbientLight(0x8a96ff,.9));var dl=new THREE.DirectionalLight(0xffffff,.9);dl.position.set(-4,10,8);sc.add(dl);
+[[-5,6,-4,0xff4fa3],[5,6,0,0x7a5cff],[0,6,5,0x2ee6d6]].forEach(function(a){var l=new THREE.PointLight(a[3],1.4,16);l.position.set(a[0],a[1],a[2]);sc.add(l)});
+function M(c,o){return new THREE.MeshStandardMaterial(Object.assign({color:c,metalness:.5,roughness:.45},o||{}))}
+function BM(c,a){return new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:a||1})}
+function B(w,h,d,m,x,y,z,p){var o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);p.add(o);return o}
+var fl=new THREE.Mesh(new THREE.PlaneGeometry(28,24),M(0x0b1040,{metalness:.3,roughness:.6}));fl.rotation.x=-Math.PI/2;fl.position.set(0,0,.5);sc.add(fl);
+var gr=new THREE.GridHelper(28,28,0x3a4cff,0x1a2470);gr.position.set(0,.01,.5);sc.add(gr);
+function tex(w,h,fn){var c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);return new THREE.CanvasTexture(c)}
+var wall=new THREE.Mesh(new THREE.PlaneGeometry(10,3.6),new THREE.MeshBasicMaterial({map:tex(1024,368,function(x,w,h){var g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,'#2ee6d6');g.addColorStop(.55,'#7a5cff');g.addColorStop(1,'#ff4fa3');x.fillStyle='#070b2a';x.fillRect(0,0,w,h);x.fillStyle=g;x.font='800 170px Unbounded,Arial Black,sans-serif';x.textAlign='center';x.fillText('АВАТАР',w/2,h/2+30);x.font='600 34px Arial';x.fillStyle='#a9b6d8';x.fillText('КОМПЬЮТЕРНЫЙ КЛУБ',w/2,h-40)})}));wall.position.set(0,3.2,-7.85);sc.add(wall);
+var seats=[],roots=[];
+function label(g,txt,y){var t=tex(160,56,function(x,w,h){x.fillStyle='rgba(5,8,40,.85)';x.fillRect(0,0,w,h);x.fillStyle='#fff';x.font='700 30px Arial';x.textAlign='center';x.fillText(txt,w/2,38)});var s=new THREE.Sprite(new THREE.SpriteMaterial({map:t}));s.scale.set(1.3,.45,1);s.position.set(0,y,-.2);g.add(s)}
+function ring(g,z){var m=new THREE.Mesh(new THREE.RingGeometry(.85,1,40),new THREE.MeshBasicMaterial({color:0x2ee6d6,transparent:true,opacity:.85,side:THREE.DoubleSide}));m.rotation.x=-Math.PI/2;m.position.set(0,.03,z);g.add(m);return m}
+function pc(zk,i,x,z){var Zn=Z[zk],c=Zn.c,w=Zn.w,g=new THREE.Group();g.position.set(x,0,z);
+ B(2.2,.1,1.1,M(0x151a30),0,.78,0,g);B(2.2,.04,.04,BM(c),0,.8,.55,g);B(.08,.78,1,M(0x151a30),-1.05,.39,0,g);B(.08,.78,1,M(0x151a30),1.05,.39,0,g);
+ B(w,.6,.05,M(0x05060d),0,1.4,-.25,g);var sr=new THREE.Mesh(new THREE.PlaneGeometry(w-.06,.54),BM(c,.85));sr.position.set(0,1.4,-.222);g.add(sr);
+ B(.07,.35,.07,M(0x222638),0,1.0,-.28,g);B(.4,.03,.25,M(0x222638),0,.85,-.28,g);
+ B(.7,.03,.25,M(0x222638),0,.85,.2,g);B(.1,.04,.16,M(0x222638),.6,.85,.2,g);
+ var hs=new THREE.Mesh(new THREE.TorusGeometry(.11,.02,8,20),BM(c));hs.rotation.x=Math.PI/2;hs.position.set(-.7,.88,.2);g.add(hs);
+ B(.35,.7,.55,M(0x101428),1.35,.35,-.1,g);var tg=new THREE.Mesh(new THREE.PlaneGeometry(.3,.6),BM(c,.8));tg.position.set(1.35,.35,.18);g.add(tg);
+ var ch=new THREE.Group();ch.position.set(0,0,-1.15);ch.rotation.y=(i%3-1)*.15;g.add(ch);
+ var cy=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.06,16),M(0x111111));cy.position.y=.05;ch.add(cy);var st=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.4,8),M(0x333333));st.position.y=.28;ch.add(st);
+ B(.6,.1,.6,M(0x1d2240),0,.5,0,ch);B(.6,.9,.1,M(0x1d2240),0,1.0,-.3,ch);B(.5,.08,.11,BM(c),0,1.3,-.3,ch);
+ var id=Zn.n+'-'+(i+1);label(g,id,2.1);add(g,id,zk,ring(g,-.5),sr)}
+function add(g,id,zk,rg,sr){g.userData.seat=id;sc.add(g);roots.push(g);seats.push({id:id,z:zk,g:g,ring:rg,sr:sr,occ:false})}
+function con(i,x,z){var g=new THREE.Group();g.position.set(x,0,z);B(1.6,.5,.9,M(0x2a2f66),0,.35,0,g);B(1.6,.8,.2,M(0x2a2f66),0,.9,-.4,g);B(.3,.06,.2,BM(0xffe86b),0,.65,.1,g);label(g,'К-'+(i+1),1.7);add(g,'К-'+(i+1),'con',ring(g,0),null)}
+[['vip',-4],['pro',0],['start',4]].forEach(function(rw){for(var i=0;i<6;i++)pc(rw[0],i,-7.5+i*3,rw[1])});
+var tv=new THREE.Group();tv.position.set(-3,0,7.4);B(3.4,1.9,.1,M(0x05060d),0,1.9,0,tv);var ts=new THREE.Mesh(new THREE.PlaneGeometry(3.3,1.8),BM(0xffe86b,.8));ts.position.set(0,1.9,.06);tv.add(ts);B(.5,.15,.35,M(0x1a1a2a),0,.2,.1,tv);B(2.6,.9,.5,M(0x151a30),0,.45,0,tv);sc.add(tv);
+con(0,-3.9,5.7);con(1,-2.1,5.7);
+var seed=7;seats.forEach(function(s){seed=(seed*9301+49297)%233280;s.occ=seed/233280<.3});
+try{JSON.parse(localStorage.getItem('avatar_bk')||'[]').forEach(function(b){seats.forEach(function(s){if(s.id===b.seat)s.occ=true})})}catch(e){}
+var sel=null,beam=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,5,24,1,true),new THREE.MeshBasicMaterial({color:0xffe86b,transparent:true,opacity:.18,side:THREE.DoubleSide}));beam.visible=false;sc.add(beam);
+function paint(){seats.forEach(function(s){var c=s.occ?0xff4b4b:(s===sel?0xffe86b:0x2ee6d6);s.ring.material.color.setHex(c)})}
+function pick(s){if(!s||s.occ){return}sel=s;var Zn=Z[s.z];$('ti').textContent='Место '+s.id;$('sp').textContent=Zn.sp+' · '+Zn.pr+' ₽/час';$('ok').textContent='';beam.position.set(s.g.position.x,2.5,s.g.position.z);beam.visible=true;upd();paint()}
+function upd(){$('bk').disabled=!(sel&&$('dt').value);$('bk').textContent=sel?'Забронировать · '+Z[sel.z].pr*$('hr').value+' ₽':'Забронировать'}
+$('dt').oninput=upd;$('hr').onchange=upd;
+$('bk').onclick=function(){if(!sel)return;var b={seat:sel.id,dt:$('dt').value,hours:$('hr').value};
+ try{var a=JSON.parse(localStorage.getItem('avatar_bk')||'[]');a.push(b);localStorage.setItem('avatar_bk',JSON.stringify(a))}catch(e){}
+ /* TODO: сохранить b в Firestore / отправить администратору */
+ sel.occ=true;$('ok').textContent='Готово! Место '+sel.id+' забронировано.';$('ti').textContent='Выберите место';$('sp').textContent='Нажмите на свободный ПК в зале.';sel=null;beam.visible=false;upd();paint()};
+var F={all:{n:'Все',t:[0,.5,2],r:18},vip:{n:'VIP',t:[0,.8,-4],r:11},pro:{n:'Про',t:[0,.8,0],r:11},start:{n:'Старт',t:[0,.8,4],r:11},con:{n:'Консоль',t:[-3,.8,6.5],r:10}};
+var az=0,el=.95,tg=new THREE.Vector3(0,.5,2),tt=[0,.5,2],rad=19,tr=19,asp=1;
+function focus(k){var f=F[k];tt=f.t;tr=f.r*(asp<.8?1.5:1);document.querySelectorAll('#chips button').forEach(function(b){b.className=b.dataset.k===k?'on':''})}
+Object.keys(F).forEach(function(k){var b=document.createElement('button');b.textContent=F[k].n;b.dataset.k=k;b.onclick=function(){focus(k)};$('chips').appendChild(b)});
+function sz(){var w=innerWidth,h=innerHeight;r.setSize(w,h,false);asp=w/h;cam.aspect=asp;cam.updateProjectionMatrix();focus(document.querySelector('#chips .on')?document.querySelector('#chips .on').dataset.k:'all')}
+addEventListener('resize',sz);sz();
+var P={},md=0,pd=0,rc=new THREE.Raycaster(),mo=new THREE.Vector2(),cv=$('c');
+cv.addEventListener('pointerdown',function(e){cv.setPointerCapture(e.pointerId);P[e.pointerId]=[e.clientX,e.clientY];md=0;pd=0});
+cv.addEventListener('pointermove',function(e){var q=P[e.pointerId];if(!q)return;var ks=Object.keys(P);
+ if(ks.length===1){var dx=e.clientX-q[0],dy=e.clientY-q[1];md+=Math.abs(dx)+Math.abs(dy);az-=dx*.006;el=Math.max(.35,Math.min(1.4,el+dy*.005))}
+ else if(ks.length===2){var o=P[ks[0]==e.pointerId?ks[1]:ks[0]],d1=Math.hypot(q[0]-o[0],q[1]-o[1]),d2=Math.hypot(e.clientX-o[0],e.clientY-o[1]);tr=Math.max(7,Math.min(26,tr*d1/d2));md=99}
+ P[e.pointerId]=[e.clientX,e.clientY]});
+function up(e){var was=P[e.pointerId];delete P[e.pointerId];if(was&&md<8&&e.type==='pointerup'){mo.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);rc.setFromCamera(mo,cam);var h=rc.intersectObjects(roots,true);if(h.length){var o=h[0].object;while(o&&!o.userData.seat)o=o.parent;if(o)seats.forEach(function(s){if(s.id===o.userData.seat)pick(s)})}}}
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+cv.addEventListener('wheel',function(e){e.preventDefault();tr=Math.max(7,Math.min(26,tr+e.deltaY*.01))},{passive:false});
+paint();var t0=performance.now();
+(function loop(){var t=(performance.now()-t0)/1000;
+ rad+=(tr-rad)*.08;tg.x+=(tt[0]-tg.x)*.08;tg.y+=(tt[1]-tg.y)*.08;tg.z+=(tt[2]-tg.z)*.08;
+ cam.position.set(tg.x+rad*Math.sin(az)*Math.cos(el),tg.y+rad*Math.sin(el),tg.z+rad*Math.cos(az)*Math.cos(el));cam.lookAt(tg);
+ seats.forEach(function(s){if(s.sr)s.sr.material.opacity=s.occ?.25:.8+.15*Math.sin(t*2+s.g.position.x);s.ring.scale.setScalar(s===sel?1+.08*Math.sin(t*5):1)});
+ beam.rotation.y=t;r.render(sc,cam);requestAnimationFrame(loop)})();
+// вход: если Firebase настроен, требуем авторизацию; иначе демо-режим
+(async function(){try{var m=await import('./firebase-config.js');if(!m.configured){$('who').textContent='Демо-режим';return}
+ var a=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+ a.onAuthStateChanged(m.auth,function(u){if(!u)location.href='auth.html';else{$('who').textContent=u.displayName||u.email;$('who').style.cursor='pointer';$('who').title='Выйти';$('who').onclick=function(){a.signOut(m.auth)}}})
+}catch(e){$('who').textContent='Демо-режим'}})();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2264 @@
+// AVATAR Platform - Complete Prisma Schema
+// PostgreSQL datasource for AVATAR gaming platform
+// Generated: 2024
+// Version: 2.0.0 - FINAL VALIDATED SCHEMA
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============================================================================
+/// Initializes:
+/// - Base roles (Founder, Director, Manager, Admin, Cashier, Staff, Customer)
+/// - Permissions (booking, order, payment, branch, finance, analytics, etc.)
+/// - Product categories (Drinks, Food, Snacks, Accessories, Merchandise)
+/// - Role-Permission mappings
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS - All system enumerations
+// ============================================================================
+
+enum UserStatus {
+  active
+  blocked
+  suspended
+  pending
+}
+
+enum GenderEnum {
+  male
+  female
+  other
+}
+
+enum LanguageEnum {
+  en
+  ru
+  de
+  fr
+  es
+}
+
+enum TimezoneEnum {
+  UTC
+  MSK
+  EET
+  CET
+  EST
+  PST
+}
+
+enum ContactType {
+  phone
+  email
+  telegram
+  whatsapp
+}
+
+enum EmployeeStatus {
+  active
+  vacation
+  suspended
+  terminated
+}
+
+enum BranchStatus {
+  active
+  inactive
+  maintenance
+}
+
+enum ZoneType {
+  standard
+  vip
+  ps5
+  other
+}
+
+enum ZoneStatus {
+  active
+  inactive
+}
+
+enum StationType {
+  pc
+  ps5
+  console
+}
+
+enum StationStatus {
+  available
+  occupied
+  reserved
+  maintenance
+  disabled
+}
+
+enum BillingType {
+  hourly
+  fixed
+  package
+}
+
+enum TariffStatus {
+  active
+  inactive
+}
+
+enum CustomerStatus {
+  active
+  blocked
+  inactive
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  active
+  completed
+  cancelled
+}
+
+enum BookingSource {
+  website
+  pwa
+  telegram
+  staff
+  admin
+}
+
+enum SessionStatus {
+  active
+  completed
+  cancelled
+}
+
+enum SessionSource {
+  booking
+  staff
+  admin
+}
+
+enum QRTicketType {
+  entry
+  payment
+  session
+  order
+}
+
+enum QRTicketStatus {
+  active
+  used
+  expired
+  revoked
+}
+
+enum QRScanAction {
+  entry
+  session_start
+  order_pickup
+  other
+}
+
+enum QRScanResult {
+  success
+  failed
+}
+
+enum ProductCategoryStatus {
+  active
+  inactive
+}
+
+enum ProductStatus {
+  active
+  inactive
+}
+
+enum DeliveryType {
+  to_station
+  pickup
+  external
+}
+
+enum OrderStatus {
+  pending
+  accepted
+  preparing
+  ready
+  delivering
+  completed
+  cancelled
+}
+
+enum PaymentStatusEnum {
+  pending
+  paid
+  refunded
+}
+
+enum PaymentMethod {
+  qr
+  card
+  cash
+  wallet
+}
+
+enum DeliveryStatus {
+  pending
+  assigned
+  picked_up
+  delivering
+  delivered
+  cancelled
+}
+
+enum FinancialTransactionType {
+  income
+  expense
+}
+
+enum InventoryTransactionType {
+  purchase
+  sale
+  return
+  writeoff
+  adjustment
+  transfer
+}
+
+enum InventoryTransferStatus {
+  draft
+  sent
+  received
+  cancelled
+}
+
+enum PurchaseOrderStatus {
+  draft
+  ordered
+  received
+  cancelled
+}
+
+enum PromotionType {
+  cashback
+  discount
+  bonus
+  special
+}
+
+enum DiscountType {
+  percent
+  fixed
+}
+
+enum AudienceType {
+  all
+  new
+  vip
+  segment
+}
+
+enum PromotionStatus {
+  draft
+  active
+  expired
+}
+
+enum PromoCodeStatus {
+  active
+  inactive
+  expired
+}
+
+enum NewsStatus {
+  draft
+  published
+  archived
+}
+
+enum TournamentStatus {
+  upcoming
+  ongoing
+  completed
+  cancelled
+}
+
+enum TournamentParticipantStatus {
+  registered
+  confirmed
+  disqualified
+  completed
+}
+
+enum TelegramMessageDirection {
+  incoming
+  outgoing
+}
+
+enum NotificationChannel {
+  email
+  push
+  sms
+  telegram
+  in_app
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  read
+  failed
+}
+
+enum SupportTicketCategory {
+  technical
+  billing
+  account
+  other
+}
+
+enum SupportTicketPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum SupportTicketStatus {
+  open
+  in_progress
+  waiting
+  resolved
+  closed
+}
+
+enum EquipmentStatus {
+  active
+  maintenance
+  repair
+  retired
+}
+
+enum MaintenanceTicketPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum MaintenanceTicketStatus {
+  open
+  assigned
+  in_progress
+  resolved
+  closed
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+}
+
+enum AIConversationType {
+  recommendation
+  support
+  analytics
+  booking
+}
+
+enum AIConversationStatus {
+  active
+  archived
+}
+
+enum AIMessageRole {
+  user
+  assistant
+  system
+}
+
+enum AITaskType {
+  analysis
+  prediction
+  classification
+  recommendation
+}
+
+enum AITaskStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum CustomerSegmentStatus {
+  active
+  inactive
+}
+
+enum SystemSettingScope {
+  global
+  branch
+}
+
+enum UserTheme {
+  light
+  dark
+  auto
+}
+
+enum ConsentType {
+  privacy_policy
+  terms_of_service
+  marketing
+  data_processing
+}
+
+enum UserSessionStatus {
+  active
+  expired
+  revoked
+}
+
+enum WalletType {
+  main
+  bonus
+}
+
+enum WalletStatus {
+  active
+  blocked
+}
+
+enum WalletTransactionType {
+  deposit
+  withdrawal
+  cashback
+  refund
+  adjustment
+}
+
+enum BonusTransactionType {
+  earned
+  spent
+  expired
+  adjustment
+}
+
+enum LoyaltyLevelStatus {
+  active
+  inactive
+}
+
+enum VendorStatus {
+  active
+  inactive
+}
+
+// ============================================================================
+// 1. USERS AND AUTHENTICATION MODULE
+// ============================================================================
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique @db.VarChar(255)
+  phone         String?  @db.VarChar(30)
+  passwordHash  String   @db.VarChar(255)
+  name          String?  @db.VarChar(255)
+  status        UserStatus @default(pending)
+  emailVerified Boolean  @default(false)
+  phoneVerified Boolean  @default(false)
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+  isAdmin       Boolean  @default(false)
+  role          String   @default("user") // admin, moderator, user, guest
+
+  // Relations
+  profile                    UserProfile?
+  contacts                   UserContact[]
+  roles                      UserRole[]
+  employee                   Employee?
+  customer                   Customer?
+  sessions                   UserSession[]
+  consents                   UserConsent[]
+  settings                   UserSettings?
+  notifications              Notification[]
+  pushSubscriptions          PushSubscription[]
+  telegramAccount            TelegramAccount?
+  supportMessages            SupportMessage[]
+  aiConversations            AIConversation[]
+  auditLogs                  AuditLog[]
+  reviewReplies              ReviewReply[]
+  filesUploaded              File[]
+  systemSettingsUpdated      SystemSetting[]
+  payments                   Payment[]
+  incomeCreated              IncomeTransaction[]
+  expenseCreated             ExpenseTransaction[]   @relation("ExpenseCreatedBy")
+  expenseApproved            ExpenseTransaction[]   @relation("ExpenseApprovedBy")
+  bookingStatusChanges       BookingStatusHistory[]
+  orderStatusChanges         OrderStatusHistory[]
+  gamingSessionsStarted      GamingSession[]        @relation("GamingSessionStartedBy")
+  gamingSessionsEnded        GamingSession[]        @relation("GamingSessionEndedBy")
+  maintenanceTicketsReported MaintenanceTicket[]    @relation("MaintenanceTicketReportedBy")
+  maintenanceTicketsAssigned MaintenanceTicket[]    @relation("MaintenanceTicketAssignedTo")
+  supportTicketsAssigned     SupportTicket[]        @relation("SupportTicketAssignedTo")
+  aiTasksRequested           AITask[]               @relation("AITaskRequestedBy")
+  reviewModerations          Review[]               @relation("ReviewModeratedBy")
+  promotionsCreated          Promotion[]            @relation("PromotionCreatedBy")
+  newsAuthored               News[]
+  purchaseOrdersCreated      PurchaseOrder[]        @relation("PurchaseOrderCreatedBy")
+  inventoryTransfersCreated  InventoryTransfer[]    @relation("InventoryTransferCreatedBy")
+  inventoryTransfersApproved InventoryTransfer[]    @relation("InventoryTransferApprovedBy")
+  tournamentsCreated         Tournament[]
+  qrScans                    QRScan[]
+  adminVerificationCodes     AdminVerificationCode[] @relation("AdminVerificationCodes")
+
+  @@index([email])
+  @@index([status])
+}
+
+model UserProfile {
+  id           String       @id @default(cuid())
+  userId       String       @unique
+  firstName    String?      @db.VarChar(100)
+  lastName     String?      @db.VarChar(100)
+  displayName  String?      @db.VarChar(150)
+  avatarFileId String?
+  birthDate    DateTime?
+  gender       GenderEnum?
+  language     LanguageEnum @default(en)
+  timezone     TimezoneEnum @default(UTC)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  avatarFile File? @relation(fields: [avatarFileId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+model UserContact {
+  id         String      @id @default(cuid())
+  userId     String
+  type       ContactType
+  value      String      @db.VarChar(255)
+  isPrimary  Boolean     @default(false)
+  isVerified Boolean     @default(false)
+  verifiedAt DateTime?
+  createdAt  DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, value])
+  @@index([userId])
+}
+
+model UserSession {
+  id        String            @id @default(cuid())
+  userId    String
+  token     String            @unique @db.VarChar(500)
+  expiresAt DateTime
+  status    UserSessionStatus @default(active)
+  userAgent String?           @db.Text
+  ipAddress String?           @db.Inet()
+  createdAt DateTime          @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model UserConsent {
+  id          String      @id @default(cuid())
+  userId      String
+  consentType ConsentType
+  givenAt     DateTime    @default(now())
+  revokedAt   DateTime?
+  ipAddress   String?     @db.Inet()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, consentType])
+  @@index([userId])
+}
+
+model UserSettings {
+  id                 String    @id @default(cuid())
+  userId             String    @unique
+  theme              UserTheme @default(auto)
+  emailNotifications Boolean   @default(true)
+  pushNotifications  Boolean   @default(true)
+  smsNotifications   Boolean   @default(false)
+  twoFactorEnabled   Boolean   @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ============================================================================
+// 2. FILES STORAGE MODULE
+// ============================================================================
+
+model File {
+  id           String   @id @default(cuid())
+  userId       String
+  filename     String   @db.VarChar(255)
+  originalName String   @db.VarChar(255)
+  mimeType     String   @db.VarChar(100)
+  size         BigInt
+  url          String   @db.Text
+  storagePath  String   @db.Text
+  isPublic     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  uploadedBy       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userProfiles     UserProfile[]
+  branchMaps       BranchMap[]
+  hardwareProfiles HardwareProfile[]
+  seoMetadataOg    SEOMetadata[]
+  orderItems       OrderItem[]
+
+  @@index([userId])
+  @@index([isPublic])
+}
+
+// ============================================================================
+// 3. ROLES AND PERMISSIONS MODULE
+// ============================================================================
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique @db.VarChar(100)
+  code        String   @unique @db.VarChar(100)
+  description String?  @db.Text
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  permissions RolePermission[]
+  userRoles   UserRole[]
+
+  @@index([code])
+}
+
+model Permission {
+  id          String  @id @default(cuid())
+  code        String  @unique @db.VarChar(150)
+  name        String  @db.VarChar(150)
+  module      String  @db.VarChar(100)
+  description String? @db.Text
+
+  roles RolePermission[]
+
+  @@index([module])
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model UserRole {
+  id         String   @id @default(cuid())
+  userId     String
+  roleId     String
+  branchId   String?
+  assignedBy String?
+  createdAt  DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, roleId, branchId])
+  @@index([userId])
+  @@index([branchId])
+}
+
+// ============================================================================
+// 4. EMPLOYEES MODULE
+// ============================================================================
+
+model Employee {
+  id              String         @id @default(cuid())
+  userId          String         @unique
+  employeeNumber  String         @unique @db.VarChar(50)
+  position        String         @db.VarChar(100)
+  hireDate        DateTime
+  terminationDate DateTime?
+  status          EmployeeStatus @default(active)
+  createdAt       DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+// ============================================================================
+// 5. BRANCHES MODULE
+// ============================================================================
+
+model Branch {
+  id          String       @id @default(cuid())
+  name        String       @db.VarChar(150)
+  slug        String       @unique @db.VarChar(150)
+  code        String       @unique @db.VarChar(50)
+  description String?      @db.Text
+  phone       String?      @db.VarChar(30)
+  whatsapp    String?      @db.VarChar(30)
+  email       String?      @db.VarChar(255)
+  address     String?      @db.Text
+  city        String?      @db.VarChar(100)
+  district    String?      @db.VarChar(100)
+  postalCode  String?      @db.VarChar(20)
+  latitude    Decimal?     @db.Decimal(10, 7)
+  longitude   Decimal?     @db.Decimal(10, 7)
+  timezone    String       @db.VarChar(50)
+  is24_7      Boolean      @default(false)
+  status      BranchStatus @default(active)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  zones                  Zone[]
+  workingHours           BranchWorkingHours[]
+  specialHours           BranchSpecialHours[]
+  tariffs                Tariff[]
+  products               BranchProduct[]
+  bookings               Booking[]
+  gamingSessions         GamingSession[]
+  orders                 Order[]
+  deliveries             Delivery[]
+  payments               Payment[]
+  incomeTransactions     IncomeTransaction[]
+  expenseTransactions    ExpenseTransaction[]
+  equipment              Equipment[]
+  maintenanceTickets     MaintenanceTicket[]
+  reviews                Review[]
+  supportTickets         SupportTicket[]
+  tournaments            Tournament[]
+  purchaseOrders         PurchaseOrder[]
+  inventoryTransactions  InventoryTransaction[]
+  inventoryTransfersFrom InventoryTransfer[]    @relation("InventoryTransferFrom")
+  inventoryTransfersTo   InventoryTransfer[]    @relation("InventoryTransferTo")
+  branchMaps             BranchMap[]
+  gamingStations         GamingStation[]
+  userRoles              UserRole[]
+  qrScans                QRScan[]
+  customerPreferred      Customer[]             @relation("PreferredBranch")
+  auditLogs              AuditLog[]
+  PromotionRule          PromotionRule[]
+
+  @@index([slug])
+  @@index([code])
+  @@index([status])
+  @@index([city])
+}
+
+model BranchWorkingHours {
+  id        String   @id @default(cuid())
+  branchId  String
+  dayOfWeek Int
+  openTime  DateTime @db.Time()
+  closeTime DateTime @db.Time()
+  isClosed  Boolean  @default(false)
+
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([branchId, dayOfWeek])
+  @@index([branchId])
+}
+
+model BranchSpecialHours {
+  id        String    @id @default(cuid())
+  branchId  String
+  date      DateTime  @db.Date()
+  openTime  DateTime? @db.Time()
+  closeTime DateTime? @db.Time()
+  isClosed  Boolean   @default(false)
+  reason    String?   @db.VarChar(255)
+
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([branchId, date])
+  @@index([branchId])
+}
+
+// ============================================================================
+// 6. ZONES MODULE
+// ============================================================================
+
+model Zone {
+  id          String     @id @default(cuid())
+  branchId    String
+  name        String     @db.VarChar(100)
+  code        String     @db.VarChar(50)
+  type        ZoneType
+  description String?    @db.Text
+  capacity    Int
+  sortOrder   Int        @default(0)
+  status      ZoneStatus @default(active)
+  createdAt   DateTime   @default(now())
+
+  branch         Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  gamingStations GamingStation[]
+  bookings       Booking[]
+  tariffs        Tariff[]
+  promotionRules PromotionRule[]
+  deliveries     Delivery[]
+
+  @@unique([branchId, code])
+  @@index([branchId])
+  @@index([type])
+}
+
+// ============================================================================
+// 7. GAMING STATIONS MODULE
+// ============================================================================
+
+model GamingStation {
+  id            String        @id @default(cuid())
+  branchId      String
+  zoneId        String
+  stationNumber String        @db.VarChar(50)
+  name          String        @db.VarChar(100)
+  type          StationType
+  status        StationStatus @default(available)
+  positionX     Decimal?      @db.Decimal(10, 2)
+  positionY     Decimal?      @db.Decimal(10, 2)
+  sortOrder     Int           @default(0)
+  description   String?       @db.Text
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  branch             Branch                  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  zone               Zone                    @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  hardware           GamingStationHardware[]
+  bookings           Booking[]
+  gamingSessions     GamingSession[]
+  deliveries         Delivery[]
+  equipment          Equipment[]
+  maintenanceTickets MaintenanceTicket[]
+  bookingHolds       BookingHold[]
+  qrScans            QRScan[]
+
+  @@unique([branchId, stationNumber])
+  @@index([branchId])
+  @@index([zoneId])
+  @@index([type])
+  @@index([status])
+}
+
+// ============================================================================
+// 8. HARDWARE CONFIGURATION MODULE
+// ============================================================================
+
+model HardwareProfile {
+  id           String  @id @default(cuid())
+  imageFileId  String?
+  name         String  @unique @db.VarChar(150)
+  cpu          String  @db.VarChar(150)
+  gpu          String  @db.VarChar(150)
+  ramGb        Int
+  storage      String  @db.VarChar(100)
+  monitorModel String  @db.VarChar(150)
+  monitorHz    Int
+  description  String? @db.Text
+
+  gameStations GamingStationHardware[]
+  imageFile    File?                   @relation(fields: [imageFileId], references: [id], onDelete: SetNull)
+
+  @@index([name])
+}
+
+model GamingStationHardware {
+  id                String    @id @default(cuid())
+  stationId         String
+  hardwareProfileId String
+  validFrom         DateTime  @default(now())
+  validTo           DateTime?
+
+  station         GamingStation   @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  hardwareProfile HardwareProfile @relation(fields: [hardwareProfileId], references: [id], onDelete: Cascade)
+
+  @@index([stationId])
+  @@index([hardwareProfileId])
+}
+
+// ============================================================================
+// 9. BRANCH MAP MODULE
+// ============================================================================
+
+model BranchMap {
+  id          String   @id @default(cuid())
+  branchId    String
+  imageFileId String?
+  name        String   @db.VarChar(150)
+  version     Int      @default(1)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  branch    Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  imageFile File?  @relation(fields: [imageFileId], references: [id], onDelete: SetNull)
+
+  @@index([branchId])
+}
+
+// ============================================================================
+// 10. TARIFFS MODULE
+// ============================================================================
+
+model Tariff {
+  id                 String       @id @default(cuid())
+  branchId           String
+  zoneId             String
+  name               String       @db.VarChar(150)
+  code               String       @db.VarChar(50)
+  description        String?      @db.Text
+  billingType        BillingType
+  price              Decimal      @db.Decimal(12, 2)
+  durationMinutes    Int?
+  minDurationMinutes Int?
+  maxDurationMinutes Int?
+  status             TariffStatus @default(active)
+  validFrom          DateTime     @default(now())
+  validTo            DateTime?
+
+  branch         Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  zone           Zone            @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  rules          TariffRule[]
+  bookings       Booking[]
+  promotionRules PromotionRule[]
+
+  @@unique([branchId, zoneId, code])
+  @@index([branchId])
+  @@index([zoneId])
+  @@index([status])
+}
+
+model TariffRule {
+  id        String   @id @default(cuid())
+  tariffId  String
+  dayOfWeek Int
+  startTime DateTime @db.Time()
+  endTime   DateTime @db.Time()
+  price     Decimal  @db.Decimal(12, 2)
+  priority  Int      @default(0)
+  isActive  Boolean  @default(true)
+
+  tariff Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+
+  @@index([tariffId])
+  @@index([dayOfWeek])
+}
+
+// ============================================================================
+// 11. CUSTOMERS / CRM MODULE
+// ============================================================================
+
+model Customer {
+  id                String         @id @default(cuid())
+  userId            String         @unique
+  customerNumber    String         @unique @db.VarChar(50)
+  status            CustomerStatus @default(active)
+  loyaltyLevelId    String?
+  preferredBranchId String?
+  firstVisitAt      DateTime?
+  lastVisitAt       DateTime?
+  totalVisits       Int            @default(0)
+  totalSpent        Decimal        @default(0) @db.Decimal(12, 2)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  loyaltyLevel           LoyaltyLevel?           @relation(fields: [loyaltyLevelId], references: [id], onDelete: SetNull)
+  preferredBranch        Branch?                 @relation("PreferredBranch", fields: [preferredBranchId], references: [id], onDelete: SetNull)
+  addresses              CustomerAddress[]
+  bookings               Booking[]
+  gamingSessions         GamingSession[]
+  orders                 Order[]
+  payments               Payment[]
+  wallets                Wallet[]
+  bonusTransactions      BonusTransaction[]
+  reviews                Review[]
+  supportTickets         SupportTicket[]
+  tournamentParticipants TournamentParticipant[]
+  segmentMembers         CustomerSegmentMember[]
+  bookingHolds           BookingHold[]
+  qrTickets              QRTicket[]
+  promoCodeUsages        PromoCodeUsage[]
+
+  @@index([status])
+  @@index([loyaltyLevelId])
+  @@index([preferredBranchId])
+}
+
+model CustomerAddress {
+  id         String   @id @default(cuid())
+  customerId String
+  title      String   @db.VarChar(100)
+  address    String   @db.Text
+  city       String   @db.VarChar(100)
+  latitude   Decimal? @db.Decimal(10, 7)
+  longitude  Decimal? @db.Decimal(10, 7)
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orders   Order[]
+
+  @@index([customerId])
+}
+
+model CustomerSegment {
+  id          String                @id @default(cuid())
+  name        String                @unique @db.VarChar(150)
+  code        String                @unique @db.VarChar(100)
+  description String?               @db.Text
+  status      CustomerSegmentStatus @default(active)
+  createdAt   DateTime              @default(now())
+
+  members CustomerSegmentMember[]
+
+  @@index([status])
+}
+
+model CustomerSegmentMember {
+  id         String   @id @default(cuid())
+  segmentId  String
+  customerId String
+  addedAt    DateTime @default(now())
+
+  segment  CustomerSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  customer Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([segmentId, customerId])
+  @@index([segmentId])
+  @@index([customerId])
+}
+
+// ============================================================================
+// 12. BOOKINGS MODULE
+// ============================================================================
+
+model Booking {
+  id             String        @id @default(cuid())
+  bookingNumber  String        @unique @db.VarChar(50)
+  customerId     String
+  branchId       String
+  zoneId         String
+  stationId      String
+  tariffId       String
+  startAt        DateTime
+  endAt          DateTime
+  status         BookingStatus @default(pending)
+  source         BookingSource
+  subtotal       Decimal       @db.Decimal(12, 2)
+  discountAmount Decimal       @default(0) @db.Decimal(12, 2)
+  bonusAmount    Decimal       @default(0) @db.Decimal(12, 2)
+  totalAmount    Decimal       @db.Decimal(12, 2)
+  notes          String?       @db.Text
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  cancelledAt    DateTime?
+  cancelReason   String?       @db.Text
+
+  customer        Customer               @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  branch          Branch                 @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  zone            Zone                   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  station         GamingStation          @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  tariff          Tariff                 @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+  statusHistory   BookingStatusHistory[]
+  items           BookingItem[]
+  holds           BookingHold[]
+  gamingSessions  GamingSession[]
+  qrTickets       QRTicket[]
+  payments        Payment[]
+  orders          Order[]
+  promoCodeUsages PromoCodeUsage[]
+  Review          Review?
+
+  @@index([customerId])
+  @@index([branchId])
+  @@index([status])
+  @@index([startAt])
+}
+
+model BookingStatusHistory {
+  id        String         @id @default(cuid())
+  bookingId String
+  oldStatus BookingStatus?
+  newStatus BookingStatus
+  changedBy String?
+  reason    String?        @db.Text
+  createdAt DateTime       @default(now())
+
+  booking       Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  changedByUser User?   @relation(fields: [changedBy], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+}
+
+model BookingItem {
+  id         String  @id @default(cuid())
+  bookingId  String
+  type       String  @db.VarChar(100)
+  name       String  @db.VarChar(255)
+  quantity   Int
+  unitPrice  Decimal @db.Decimal(12, 2)
+  totalPrice Decimal @db.Decimal(12, 2)
+  metadata   Json?
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+}
+
+model BookingHold {
+  id         String   @id @default(cuid())
+  stationId  String
+  customerId String
+  startAt    DateTime
+  endAt      DateTime
+  expiresAt  DateTime
+  status     String   @default("active") @db.VarChar(50)
+  bookingId  String?
+  createdAt  DateTime @default(now())
+
+  station  GamingStation @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  customer Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  booking  Booking?      @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([stationId])
+  @@index([customerId])
+  @@index([expiresAt])
+}
+
+// ============================================================================
+// 13. GAMING SESSIONS MODULE
+// ============================================================================
+
+model GamingSession {
+  id                    String        @id @default(cuid())
+  bookingId             String?
+  customerId            String
+  branchId              String
+  stationId             String
+  startedAt             DateTime
+  endedAt               DateTime?
+  plannedEndAt          DateTime
+  status                SessionStatus @default(active)
+  actualDurationMinutes Int?
+  source                SessionSource
+  startedBy             String?
+  endedBy               String?
+
+  booking       Booking?      @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  branch        Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  station       GamingStation @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  startedByUser User?         @relation("GamingSessionStartedBy", fields: [startedBy], references: [id], onDelete: SetNull)
+  endedByUser   User?         @relation("GamingSessionEndedBy", fields: [endedBy], references: [id], onDelete: SetNull)
+  orders        Order[]
+
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([status])
+  @@index([startedAt])
+}
+
+// ============================================================================
+// 14. QR SYSTEM MODULE
+// ============================================================================
+
+model QRTicket {
+  id         String         @id @default(cuid())
+  bookingId  String?
+  customerId String
+  tokenHash  String         @unique @db.VarChar(255)
+  type       QRTicketType
+  status     QRTicketStatus @default(active)
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime       @default(now())
+
+  booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  scans    QRScan[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model QRScan {
+  id         String       @id @default(cuid())
+  ticketId   String
+  scannedBy  String
+  branchId   String
+  stationId  String?
+  action     QRScanAction
+  result     QRScanResult
+  deviceInfo Json?
+  ipAddress  String?      @db.Inet()
+  createdAt  DateTime     @default(now())
+
+  ticket        QRTicket       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  scannedByUser User           @relation(fields: [scannedBy], references: [id], onDelete: Cascade)
+  branch        Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  station       GamingStation? @relation(fields: [stationId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId])
+  @@index([scannedBy])
+  @@index([branchId])
+}
+
+// ============================================================================
+// 15. SHOP PRODUCTS MODULE
+// ============================================================================
+
+model ProductCategory {
+  id          String                @id @default(cuid())
+  parentId    String?
+  name        String                @db.VarChar(150)
+  slug        String                @unique @db.VarChar(150)
+  description String?               @db.Text
+  sortOrder   Int                   @default(0)
+  status      ProductCategoryStatus @default(active)
+  createdAt   DateTime              @default(now())
+
+  parentCategory  ProductCategory?  @relation("ParentCategory", fields: [parentId], references: [id], onDelete: SetNull)
+  childCategories ProductCategory[] @relation("ParentCategory")
+  products        Product[]
+
+  @@index([parentId])
+  @@index([status])
+}
+
+model Product {
+  id               String        @id @default(cuid())
+  categoryId       String
+  sku              String        @unique @db.VarChar(100)
+  name             String        @db.VarChar(255)
+  slug             String        @unique @db.VarChar(255)
+  description      String?       @db.Text
+  shortDescription String?       @db.Text
+  price            Decimal       @db.Decimal(12, 2)
+  costPrice        Decimal       @db.Decimal(12, 2)
+  status           ProductStatus @default(active)
+  isFeatured       Boolean       @default(false)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  category               ProductCategory         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  branchProducts         BranchProduct[]
+  orderItems             OrderItem[]
+  purchaseOrderItems     PurchaseOrderItem[]
+  inventoryTransactions  InventoryTransaction[]
+  inventoryTransferItems InventoryTransferItem[]
+  PromotionRule          PromotionRule[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([sku])
+}
+
+model BranchProduct {
+  id            String   @id @default(cuid())
+  branchId      String
+  productId     String
+  price         Decimal  @db.Decimal(12, 2)
+  isAvailable   Boolean  @default(true)
+  stockQuantity Decimal  @db.Decimal(12, 3)
+  minStockLevel Decimal  @db.Decimal(12, 3)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  branch  Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([branchId, productId])
+  @@index([branchId])
+  @@index([productId])
+}
+
+// ============================================================================
+// 16. ORDERS AND DELIVERY MODULE
+// ============================================================================
+
+model Order {
+  id                String            @id @default(cuid())
+  orderNumber       String            @unique @db.VarChar(50)
+  customerId        String
+  branchId          String
+  bookingId         String?
+  sessionId         String?
+  deliveryType      DeliveryType
+  deliveryAddressId String?
+  status            OrderStatus       @default(pending)
+  paymentStatus     PaymentStatusEnum @default(pending)
+  subtotal          Decimal           @db.Decimal(12, 2)
+  discountAmount    Decimal           @default(0) @db.Decimal(12, 2)
+  bonusAmount       Decimal           @default(0) @db.Decimal(12, 2)
+  deliveryFee       Decimal           @default(0) @db.Decimal(12, 2)
+  totalAmount       Decimal           @db.Decimal(12, 2)
+  customerComment   String?           @db.Text
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  customer        Customer             @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  branch          Branch               @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  booking         Booking?             @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  session         GamingSession?       @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  deliveryAddress CustomerAddress?     @relation(fields: [deliveryAddressId], references: [id], onDelete: SetNull)
+  items           OrderItem[]
+  statusHistory   OrderStatusHistory[]
+  delivery        Delivery?
+  payments        Payment[]
+  PromoCodeUsage  PromoCodeUsage[]
+
+  @@index([customerId])
+  @@index([branchId])
+  @@index([status])
+  @@index([bookingId])
+}
+
+model OrderItem {
+  id                  String  @id @default(cuid())
+  orderId             String
+  productId           String
+  fileId              String?
+  productNameSnapshot String  @db.VarChar(255)
+  quantity            Decimal @db.Decimal(12, 3)
+  unitPrice           Decimal @db.Decimal(12, 2)
+  totalPrice          Decimal @db.Decimal(12, 2)
+  metadata            Json?
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  file    File?   @relation(fields: [fileId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model OrderStatusHistory {
+  id        String       @id @default(cuid())
+  orderId   String
+  oldStatus OrderStatus?
+  newStatus OrderStatus
+  changedBy String?
+  comment   String?      @db.Text
+  createdAt DateTime     @default(now())
+
+  order         Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedByUser User? @relation(fields: [changedBy], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+model Delivery {
+  id           String         @id @default(cuid())
+  orderId      String         @unique
+  deliveryType DeliveryType
+  branchId     String
+  zoneId       String?
+  stationId    String?
+  courierId    String?
+  status       DeliveryStatus @default(pending)
+  assignedAt   DateTime?
+  pickedUpAt   DateTime?
+  deliveredAt  DateTime?
+  notes        String?        @db.Text
+
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  branch  Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  zone    Zone?          @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  station GamingStation? @relation(fields: [stationId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([branchId])
+  @@index([status])
+}
+
+// ============================================================================
+// 17. PAYMENTS MODULE
+// ============================================================================
+
+model Payment {
+  id                String            @id @default(cuid())
+  paymentNumber     String            @unique @db.VarChar(100)
+  customerId        String
+  branchId          String
+  bookingId         String?
+  orderId           String?
+  provider          String            @db.VarChar(100)
+  providerPaymentId String?           @db.VarChar(255)
+  method            PaymentMethod
+  amount            Decimal           @db.Decimal(12, 2)
+  currency          String            @db.VarChar(10)
+  status            PaymentStatusEnum @default(pending)
+  paidAt            DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  customer Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  branch   Branch           @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  booking  Booking?         @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  order    Order?           @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  webhooks PaymentWebhook[]
+  User     User?            @relation(fields: [userId], references: [id])
+  userId   String?
+
+  @@index([customerId])
+  @@index([branchId])
+  @@index([status])
+}
+
+model PaymentWebhook {
+  id             String    @id @default(cuid())
+  paymentId      String
+  provider       String    @db.VarChar(100)
+  eventId        String    @db.VarChar(255)
+  eventType      String    @db.VarChar(100)
+  payload        Json
+  signatureValid Boolean
+  processed      Boolean   @default(false)
+  processedAt    DateTime?
+  createdAt      DateTime  @default(now())
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@unique([paymentId, eventId])
+  @@index([paymentId])
+  @@index([provider])
+}
+
+// ============================================================================
+// 18. WALLET AND BONUS SYSTEM
+// ============================================================================
+
+model Wallet {
+  id         String       @id @default(cuid())
+  customerId String
+  type       WalletType
+  balance    Decimal      @db.Decimal(12, 2)
+  currency   String       @db.VarChar(10)
+  status     WalletStatus @default(active)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  customer     Customer            @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+
+  @@unique([customerId, type])
+  @@index([customerId])
+}
+
+model WalletTransaction {
+  id            String                @id @default(cuid())
+  walletId      String
+  type          WalletTransactionType
+  amount        Decimal               @db.Decimal(12, 2)
+  balanceBefore Decimal               @db.Decimal(12, 2)
+  balanceAfter  Decimal               @db.Decimal(12, 2)
+  referenceType String?               @db.VarChar(100)
+  referenceId   String?
+  description   String?               @db.Text
+  createdBy     String?
+  createdAt     DateTime              @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId])
+  @@index([createdAt])
+}
+
+model BonusTransaction {
+  id            String               @id @default(cuid())
+  customerId    String
+  walletId      String
+  type          BonusTransactionType
+  amount        Decimal              @db.Decimal(12, 2)
+  referenceType String?              @db.VarChar(100)
+  referenceId   String?
+  expiresAt     DateTime?
+  description   String?              @db.Text
+  createdAt     DateTime             @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([expiresAt])
+}
+
+// ============================================================================
+// 19. LOYALTY PROGRAM MODULE
+// ============================================================================
+
+model LoyaltyLevel {
+  id              String             @id @default(cuid())
+  name            String             @unique @db.VarChar(100)
+  code            String             @unique @db.VarChar(50)
+  minSpent        Decimal            @db.Decimal(12, 2)
+  discountPercent Decimal            @db.Decimal(5, 2)
+  cashbackPercent Decimal            @db.Decimal(5, 2)
+  priority        Int
+  status          LoyaltyLevelStatus @default(active)
+  createdAt       DateTime           @default(now())
+
+  customers      Customer[]
+  promotionRules PromotionRule[]
+
+  @@index([status])
+}
+
+// ============================================================================
+// 20. PROMOTIONS AND CAMPAIGNS
+// ============================================================================
+
+model Promotion {
+  id            String          @id @default(cuid())
+  name          String          @db.VarChar(255)
+  slug          String          @unique @db.VarChar(255)
+  description   String?         @db.Text
+  type          PromotionType
+  discountType  DiscountType
+  discountValue Decimal         @db.Decimal(12, 2)
+  minAmount     Decimal         @db.Decimal(12, 2)
+  maxDiscount   Decimal         @db.Decimal(12, 2)
+  startAt       DateTime
+  endAt         DateTime
+  audienceType  AudienceType
+  status        PromotionStatus @default(draft)
+  createdBy     String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  author     User            @relation("PromotionCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  rules      PromotionRule[]
+  promoCodes PromoCode[]
+
+  @@index([status])
+  @@index([startAt])
+  @@index([endAt])
+}
+
+model PromotionRule {
+  id             String  @id @default(cuid())
+  promotionId    String
+  branchId       String?
+  zoneId         String?
+  tariffId       String?
+  productId      String?
+  loyaltyLevelId String?
+
+  promotion    Promotion     @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  branch       Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  zone         Zone?         @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  tariff       Tariff?       @relation(fields: [tariffId], references: [id], onDelete: SetNull)
+  product      Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  loyaltyLevel LoyaltyLevel? @relation(fields: [loyaltyLevelId], references: [id], onDelete: SetNull)
+
+  @@index([promotionId])
+  @@index([branchId])
+  @@index([zoneId])
+  @@index([tariffId])
+  @@index([productId])
+  @@index([loyaltyLevelId])
+}
+
+model PromoCode {
+  id               String          @id @default(cuid())
+  promotionId      String
+  code             String          @unique @db.VarChar(100)
+  usageLimit       Int?
+  usageCount       Int             @default(0)
+  perCustomerLimit Int?
+  validFrom        DateTime
+  validTo          DateTime
+  status           PromoCodeStatus @default(active)
+  createdAt        DateTime        @default(now())
+
+  promotion Promotion        @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  usages    PromoCodeUsage[]
+
+  @@index([promotionId])
+  @@index([status])
+  @@index([validTo])
+}
+
+model PromoCodeUsage {
+  id             String   @id @default(cuid())
+  promoCodeId    String
+  customerId     String
+  bookingId      String?
+  orderId        String?
+  discountAmount Decimal  @db.Decimal(12, 2)
+  usedAt         DateTime @default(now())
+
+  promoCode PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  customer  Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  booking   Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  order     Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([promoCodeId])
+  @@index([customerId])
+  @@index([usedAt])
+}
+
+// ============================================================================
+// 21. CONTENT AND NEWS MODULE
+// ============================================================================
+
+model News {
+  id             String     @id @default(cuid())
+  title          String     @db.VarChar(255)
+  slug           String     @unique @db.VarChar(255)
+  excerpt        String?    @db.Text
+  content        String?    @db.Text
+  coverFileId    String?
+  status         NewsStatus @default(draft)
+  publishedAt    DateTime?
+  authorId       String
+  seoTitle       String?    @db.VarChar(255)
+  seoDescription String?    @db.Text
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  author      User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  seoMetadata SEOMetadata?
+
+  @@index([status])
+  @@index([publishedAt])
+  @@index([authorId])
+}
+
+model SEOMetadata {
+  id              String   @id @default(cuid())
+  newsId          String?  @unique
+  entityType      String   @db.VarChar(100)
+  entityId        String   @db.VarChar(100)
+  metaTitle       String?  @db.VarChar(255)
+  metaDescription String?  @db.Text
+  canonicalUrl    String?  @db.Text
+  ogTitle         String?  @db.VarChar(255)
+  ogDescription   String?  @db.Text
+  ogImageFileId   String?
+  robots          String?  @db.VarChar(100)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  news   News?   @relation(fields: [newsId], references: [id], onDelete: SetNull)
+  File   File?   @relation(fields: [fileId], references: [id])
+  fileId String?
+
+  @@unique([entityType, entityId])
+  @@index([entityType])
+  @@index([entityId])
+}
+
+// ============================================================================
+// 22. TOURNAMENTS MODULE
+// ============================================================================
+
+model Tournament {
+  id                   String           @id @default(cuid())
+  branchId             String
+  name                 String           @db.VarChar(255)
+  slug                 String           @unique @db.VarChar(255)
+  game                 String           @db.VarChar(100)
+  description          String?          @db.Text
+  startAt              DateTime
+  registrationDeadline DateTime
+  maxParticipants      Int
+  entryFee             Decimal          @db.Decimal(12, 2)
+  prizePool            Decimal          @db.Decimal(12, 2)
+  status               TournamentStatus @default(upcoming)
+  createdBy            String
+  createdAt            DateTime         @default(now())
+
+  branch       Branch                  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  organizer    User                    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  participants TournamentParticipant[]
+
+  @@index([branchId])
+  @@index([status])
+  @@index([startAt])
+}
+
+model TournamentParticipant {
+  id           String                      @id @default(cuid())
+  tournamentId String
+  customerId   String
+  teamName     String                      @db.VarChar(150)
+  status       TournamentParticipantStatus @default(registered)
+  registeredAt DateTime                    @default(now())
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, customerId])
+  @@index([tournamentId])
+  @@index([customerId])
+}
+
+// ============================================================================
+// 23. TELEGRAM BOT MODULE
+// ============================================================================
+
+model TelegramAccount {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  telegramUserId BigInt   @unique
+  username       String?  @db.VarChar(255)
+  firstName      String?  @db.VarChar(255)
+  lastName       String?  @db.VarChar(255)
+  isActive       Boolean  @default(true)
+  linkedAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages TelegramMessage[]
+
+  @@index([telegramUserId])
+  @@index([isActive])
+}
+
+model TelegramMessage {
+  id                String                   @id @default(cuid())
+  telegramAccountId String
+  telegramMessageId BigInt
+  chatId            BigInt
+  direction         TelegramMessageDirection
+  messageType       String                   @db.VarChar(50)
+  payload           Json
+  sentAt            DateTime                 @default(now())
+
+  account TelegramAccount @relation(fields: [telegramAccountId], references: [id], onDelete: Cascade)
+
+  @@index([telegramAccountId])
+  @@index([chatId])
+  @@index([sentAt])
+}
+
+// ============================================================================
+// 24. NOTIFICATIONS MODULE
+// ============================================================================
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  type      String              @db.VarChar(100)
+  channel   NotificationChannel
+  title     String              @db.VarChar(255)
+  message   String              @db.Text
+  data      Json?
+  status    NotificationStatus  @default(pending)
+  sentAt    DateTime?
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model PushSubscription {
+  id         String    @id @default(cuid())
+  userId     String
+  endpoint   String    @db.Text
+  p256dh     String    @db.Text
+  auth       String    @db.Text
+  deviceType String?   @db.VarChar(50)
+  browser    String?   @db.VarChar(100)
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isActive])
+}
+
+// ============================================================================
+// 25. SUPPORT TICKETS MODULE
+// ============================================================================
+
+model SupportTicket {
+  id           String                @id @default(cuid())
+  ticketNumber String                @unique @db.VarChar(50)
+  customerId   String
+  branchId     String
+  category     SupportTicketCategory
+  priority     SupportTicketPriority
+  subject      String                @db.VarChar(255)
+  status       SupportTicketStatus   @default(open)
+  assignedTo   String?
+  createdAt    DateTime              @default(now())
+  closedAt     DateTime?
+
+  customer Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  branch   Branch           @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  assignee User?            @relation("SupportTicketAssignedTo", fields: [assignedTo], references: [id], onDelete: SetNull)
+  messages SupportMessage[]
+
+  @@index([customerId])
+  @@index([branchId])
+  @@index([status])
+  @@index([priority])
+}
+
+model SupportMessage {
+  id               String   @id @default(cuid())
+  ticketId         String
+  senderId         String
+  message          String   @db.Text
+  attachmentFileId String?
+  createdAt        DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([senderId])
+}
+
+// ============================================================================
+// 26. EQUIPMENT AND MAINTENANCE
+// ============================================================================
+
+model Equipment {
+  id              String          @id @default(cuid())
+  branchId        String
+  stationId       String?
+  category        String          @db.VarChar(100)
+  name            String          @db.VarChar(255)
+  serialNumber    String?         @db.VarChar(255)
+  inventoryNumber String          @unique @db.VarChar(100)
+  purchaseDate    DateTime
+  purchasePrice   Decimal         @db.Decimal(12, 2)
+  warrantyUntil   DateTime?
+  status          EquipmentStatus @default(active)
+  createdAt       DateTime        @default(now())
+
+  branch             Branch              @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  station            GamingStation?      @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  maintenanceTickets MaintenanceTicket[]
+
+  @@index([branchId])
+  @@index([stationId])
+  @@index([status])
+}
+
+model MaintenanceTicket {
+  id           String                    @id @default(cuid())
+  ticketNumber String                    @unique @db.VarChar(50)
+  branchId     String
+  stationId    String?
+  equipmentId  String?
+  reportedBy   String
+  assignedTo   String?
+  priority     MaintenanceTicketPriority
+  description  String                    @db.Text
+  status       MaintenanceTicketStatus   @default(open)
+  resolvedAt   DateTime?
+  createdAt    DateTime                  @default(now())
+
+  branch    Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  station   GamingStation? @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  equipment Equipment?     @relation(fields: [equipmentId], references: [id], onDelete: SetNull)
+  reporter  User           @relation("MaintenanceTicketReportedBy", fields: [reportedBy], references: [id], onDelete: Cascade)
+  assignee  User?          @relation("MaintenanceTicketAssignedTo", fields: [assignedTo], references: [id], onDelete: SetNull)
+
+  @@index([branchId])
+  @@index([stationId])
+  @@index([status])
+  @@index([priority])
+}
+
+// ============================================================================
+// 27. REVIEWS MODULE
+// ============================================================================
+
+model Review {
+  id          String       @id @default(cuid())
+  bookingId   String       @unique
+  customerId  String
+  branchId    String
+  rating      Int
+  title       String?      @db.VarChar(255)
+  comment     String?      @db.Text
+  status      ReviewStatus @default(pending)
+  moderatedBy String?
+  moderatedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  booking   Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customer  Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  branch    Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  moderator User?         @relation("ReviewModeratedBy", fields: [moderatedBy], references: [id], onDelete: SetNull)
+  replies   ReviewReply[]
+
+  @@index([customerId])
+  @@index([branchId])
+  @@index([status])
+  @@index([rating])
+}
+
+model ReviewReply {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  reply     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@index([userId])
+}
+
+// ============================================================================
+// 28. AI MODULE
+// ============================================================================
+
+model AIConversation {
+  id         String               @id @default(cuid())
+  userId     String
+  type       AIConversationType
+  status     AIConversationStatus @default(active)
+  title      String?              @db.VarChar(255)
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  archivedAt DateTime?
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AIMessage[]
+  tasks    AITask[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AIMessage {
+  id             String        @id @default(cuid())
+  conversationId String
+  role           AIMessageRole
+  content        String        @db.Text
+  createdAt      DateTime      @default(now())
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+model AITask {
+  id             String       @id @default(cuid())
+  conversationId String
+  type           AITaskType
+  description    String       @db.Text
+  status         AITaskStatus @default(pending)
+  input          Json?
+  output         Json?
+  error          String?      @db.Text
+  requestedBy    String
+  createdAt      DateTime     @default(now())
+  completedAt    DateTime?
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  requester    User           @relation("AITaskRequestedBy", fields: [requestedBy], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// 29. FINANCIAL MODULE
+// ============================================================================
+
+model FinancialCategory {
+  id          String                   @id @default(cuid())
+  parentId    String?
+  name        String                   @db.VarChar(150)
+  type        FinancialTransactionType
+  description String?                  @db.Text
+  isSystem    Boolean                  @default(false)
+  status      ProductCategoryStatus    @default(active)
+  createdAt   DateTime                 @default(now())
+
+  parentCategory      FinancialCategory?   @relation("ParentFinancialCategory", fields: [parentId], references: [id], onDelete: SetNull)
+  childCategories     FinancialCategory[]  @relation("ParentFinancialCategory")
+  incomeTransactions  IncomeTransaction[]
+  expenseTransactions ExpenseTransaction[]
+
+  @@index([parentId])
+  @@index([type])
+  @@index([status])
+}
+
+model IncomeTransaction {
+  id              String   @id @default(cuid())
+  branchId        String
+  categoryId      String
+  amount          Decimal  @db.Decimal(12, 2)
+  currency        String   @db.VarChar(10)
+  sourceType      String?  @db.VarChar(100)
+  sourceId        String?
+  description     String?  @db.Text
+  transactionDate DateTime @db.Date()
+  createdBy       String
+  createdAt       DateTime @default(now())
+
+  branch   Branch            @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  category FinancialCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  creator  User              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([branchId])
+  @@index([categoryId])
+  @@index([transactionDate])
+}
+
+model ExpenseTransaction {
+  id            String              @id @default(cuid())
+  branchId      String
+  categoryId    String
+  vendorId      String?
+  amount        Decimal             @db.Decimal(12, 2)
+  currency      String              @db.VarChar(10)
+  description   String?             @db.Text
+  expenseDate   DateTime            @db.Date()
+  receiptFileId String?
+  createdBy     String
+  approvedBy    String?
+  status        PurchaseOrderStatus @default(draft)
+  createdAt     DateTime            @default(now())
+
+  branch   Branch            @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  category FinancialCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  vendor   Vendor?           @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  creator  User              @relation("ExpenseCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  approver User?             @relation("ExpenseApprovedBy", fields: [approvedBy], references: [id], onDelete: SetNull)
+
+  @@index([branchId])
+  @@index([categoryId])
+  @@index([expenseDate])
+}
+
+// ============================================================================
+// 30. VENDORS AND PURCHASE MODULE
+// ============================================================================
+
+model Vendor {
+  id          String       @id @default(cuid())
+  name        String       @db.VarChar(255)
+  companyName String?      @db.VarChar(255)
+  phone       String?      @db.VarChar(30)
+  email       String?      @db.VarChar(255)
+  taxId       String?      @db.VarChar(100)
+  address     String?      @db.Text
+  status      VendorStatus @default(active)
+  createdAt   DateTime     @default(now())
+
+  expenseTransactions ExpenseTransaction[]
+  purchaseOrders      PurchaseOrder[]
+
+  @@index([status])
+}
+
+model PurchaseOrder {
+  id          String              @id @default(cuid())
+  orderNumber String              @unique @db.VarChar(100)
+  branchId    String
+  vendorId    String
+  status      PurchaseOrderStatus @default(draft)
+  subtotal    Decimal             @db.Decimal(12, 2)
+  totalAmount Decimal             @db.Decimal(12, 2)
+  expectedAt  DateTime?
+  receivedAt  DateTime?
+  createdBy   String
+  createdAt   DateTime            @default(now())
+
+  branch  Branch              @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  vendor  Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  creator User                @relation("PurchaseOrderCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  items   PurchaseOrderItem[]
+
+  @@index([branchId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+model PurchaseOrderItem {
+  id              String  @id @default(cuid())
+  purchaseOrderId String
+  productId       String
+  quantity        Decimal @db.Decimal(12, 3)
+  unitCost        Decimal @db.Decimal(12, 2)
+  totalCost       Decimal @db.Decimal(12, 2)
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([purchaseOrderId])
+  @@index([productId])
+}
+
+// ============================================================================
+// 31. INVENTORY MODULE
+// ============================================================================
+
+model InventoryTransaction {
+  id            String                   @id @default(cuid())
+  branchId      String
+  productId     String
+  type          InventoryTransactionType
+  quantity      Decimal                  @db.Decimal(12, 3)
+  unitCost      Decimal                  @db.Decimal(12, 2)
+  referenceType String?                  @db.VarChar(100)
+  referenceId   String?
+  reason        String?                  @db.Text
+  createdBy     String
+  createdAt     DateTime                 @default(now())
+
+  branch  Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([branchId])
+  @@index([productId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model InventoryTransfer {
+  id             String                  @id @default(cuid())
+  transferNumber String                  @unique @db.VarChar(100)
+  fromBranchId   String
+  toBranchId     String
+  status         InventoryTransferStatus @default(draft)
+  createdBy      String
+  approvedBy     String?
+  sentAt         DateTime?
+  receivedAt     DateTime?
+  createdAt      DateTime                @default(now())
+
+  fromBranch Branch                  @relation("InventoryTransferFrom", fields: [fromBranchId], references: [id], onDelete: Cascade)
+  toBranch   Branch                  @relation("InventoryTransferTo", fields: [toBranchId], references: [id], onDelete: Cascade)
+  creator    User                    @relation("InventoryTransferCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  approver   User?                   @relation("InventoryTransferApprovedBy", fields: [approvedBy], references: [id], onDelete: SetNull)
+  items      InventoryTransferItem[]
+
+  @@index([fromBranchId])
+  @@index([toBranchId])
+  @@index([status])
+}
+
+model InventoryTransferItem {
+  id         String  @id @default(cuid())
+  transferId String
+  productId  String
+  quantity   Decimal @db.Decimal(12, 3)
+
+  transfer InventoryTransfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  product  Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([transferId])
+  @@index([productId])
+}
+
+// ============================================================================
+// 32. SYSTEM SETTINGS MODULE
+// ============================================================================
+
+model SystemSetting {
+  id          String             @id @default(cuid())
+  key         String             @db.VarChar(150)
+  value       String             @db.Text
+  scope       SystemSettingScope @default(global)
+  branchId    String?
+  description String?            @db.Text
+  updatedBy   String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  updatedByUser User? @relation(fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([key, scope, branchId])
+  @@index([scope])
+  @@index([branchId])
+}
+
+// ============================================================================
+// 33. AUDIT LOGS MODULE
+// ============================================================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   @db.VarChar(100)
+  entityType String   @db.VarChar(100)
+  entityId   String
+  branchId   String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?  @db.Inet()
+  userAgent  String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([branchId])
+  @@index([createdAt])
+}
+
+
+
+// ============================================================================
+// 29. ADMIN 2FA MODULE - Telegram verification codes
+// ============================================================================
+
+model AdminVerificationCode {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String   @db.VarChar(6)
+  isUsed    Boolean  @default(false)
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation("AdminVerificationCodes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+  @@index([expiresAt])
+}

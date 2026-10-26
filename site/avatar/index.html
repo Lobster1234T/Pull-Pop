@@ -1,0 +1,29 @@
+<title>Аватар — компьютерный клуб</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@800&display=swap">
+<style>
+  :root { --bg: #05060d; --ink: #eef0f8; --dim: #8a93a8; color-scheme: dark; }
+  body { background: var(--bg); color: var(--ink); margin: 0; }
+  .page {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 20px;
+    max-width: 1280px; margin: 0 auto; box-sizing: border-box;
+  }
+  avatar-club-animation { width: 100%; }
+  p { font: 14px/1.6 system-ui, sans-serif; color: var(--dim); margin: 12px 0 0; }
+</style>
+
+<div class="page">
+  <!-- Так компонент подключается в любую страницу -->
+  <avatar-club-animation
+    text="AVATAR"
+    subtitle="КОМПЬЮТЕРНЫЙ КЛУБ"
+    color-a="#8a5cff"
+    color-b="#19e3ff"></avatar-club-animation>
+  <p>Размер задаётся CSS-ом на самом теге: по умолчанию ширина 100% и пропорции 16:9.</p>
+</div>
+
+<script src="avatar-animation.js"></script>

@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAGES: "true"
+      NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # API-роуты и middleware требуют сервера — на статическом хостинге их нет
+      - name: Remove server-only code
+        run: rm -rf app/api middleware.ts
+
+      - run: npx next build
+
+      # Файлы из public/ указаны в коде как "/file" — добавляем к ним basePath
+      - name: Prefix public asset paths
+        run: |
+          cd out
+          for entry in $(ls ../public); do
+            find . -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.txt' \) -print0 \
+              | xargs -0 sed -i -E "s#([\"'\`(])/${entry}#\1${NEXT_PUBLIC_BASE_PATH}/${entry}#g"
+          done
+          touch .nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

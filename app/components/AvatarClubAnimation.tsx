@@ -11,7 +11,7 @@ interface AvatarClubAnimationProps {
   speed?: number;
 }
 
-declare global {
+declare module 'react' {
   namespace JSX {
     interface IntrinsicElements {
       'avatar-club-animation': React.DetailedHTMLProps<
